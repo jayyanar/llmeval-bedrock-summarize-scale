@@ -1,0 +1,26 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-llmevalbedrocksummar-dev-79993-authRole",
+      "UnauthRoleArn": "arn:aws:iam::098493093308:role/amplify-llmevalbedrocksummar-dev-79993-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::098493093308:role/amplify-llmevalbedrocksummar-dev-79993-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-llmevalbedrocksummar-dev-79993-deployment",
+      "UnauthRoleName": "amplify-llmevalbedrocksummar-dev-79993-unauthRole",
+      "StackName": "amplify-llmevalbedrocksummar-dev-79993",
+      "StackId": "arn:aws:cloudformation:us-east-1:098493093308:stack/amplify-llmevalbedrocksummar-dev-79993/1d812a80-36cb-11ef-8377-0e8d1e74588f",
+      "AmplifyAppId": "d29qjnofas62ig"
+    },
+    "categories": {
+      "hosting": {
+        "amplifyhosting": {
+          "appId": "d29qjnofas62ig",
+          "type": "manual"
+        }
+      },
+      "auth": {
+        "llmevalbedrocksummar439a96e3": {}
+      }
+    }
+  }
+}

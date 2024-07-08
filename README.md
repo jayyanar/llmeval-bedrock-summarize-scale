@@ -41,6 +41,9 @@ A tool for evaluating and comparing the performance of multiple large language m
 5. The results of each model's evaluation are stored in a database or data store.
 6. The Amazon API Gateway acts as a proxy, receiving requests from the Amplify WebHosting service and routing them to the appropriate Step Function.
 
+![AWS_Bedrock_LLM_Playground](https://github.com/jayyanar/llmeval-bedrock-summarize-scale/assets/12956021/ebc7c30c-dbc4-4be7-b825-f89b9f4e75b9)
+
+
 ## Getting Started
 
 ### Prerequisites

@@ -5,6 +5,7 @@ A tool for evaluating and comparing the performance of multiple large language m
 ## Table of Contents
 
 - [Features](#features)
+- [Contributors](#Contributions)
 - [Architecture](#architecture)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
@@ -12,6 +13,12 @@ A tool for evaluating and comparing the performance of multiple large language m
   - [Usage](#usage)
 - [Contributing](#contributing)
 - [License](#license)
+
+## Contributions
+
+ - Ayyanar Jeyakrishnan - Solution Design, Architect, and Code Review
+ - Punith P - Front End Development
+ - Aadhityaa - Backend Development
 
 ## Features
 

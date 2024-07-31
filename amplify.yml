@@ -1,9 +1,10 @@
+#amplify.yml
 version: 1
 frontend:
   phases:
     preBuild:
       commands:
-        - npm ci
+        - npm install
     build:
       commands:
         - npm run build
@@ -14,3 +15,4 @@ frontend:
   cache:
     paths:
       - node_modules/**/*
+

@@ -1,3 +1,4 @@
+// src/components/Dashboard.js
 import React, { useState } from "react";
 import axios from "axios";
 import {
@@ -65,7 +66,7 @@ const Dashboard = ({ modelGroups = {} }) => {
       setIsLoading(true);
       try {
         const response = await axios.post(
-          `${process.env.REACT_APP_API_BASE_URL}/execute`,  # add authentication to use api key from .env
+          `${process.env.REACT_APP_EXECUTEAPI}`,
           {
             Context: prompt,
             Model1: selectedModels[0],
@@ -73,6 +74,11 @@ const Dashboard = ({ modelGroups = {} }) => {
             Model3: selectedModels[2],
             eval_model: evaluationModel,
             RunID: `summary_${Math.random().toString(36).substr(2, 8)}`,
+          },
+          {
+            headers: {
+              'x-api-key': process.env.REACT_APP_API_KEY,
+            },
           }
         );
         console.log("API response:", response.data);

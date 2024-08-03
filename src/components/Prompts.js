@@ -10,7 +10,7 @@ const Prompts = () => {
 
   const fetchPrompts = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/prompt`);
+      const response = await axios.get(`${process.env.REACT_APP_PROMPTAPI}`);
       setPrompts(JSON.parse(response.data.body));
     } catch (error) {
       console.error('Error fetching prompts:', error);

@@ -57,7 +57,7 @@ function App() {
   const fetchProjects = async () => {
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_API_BASE_URL}/status`
+        `${process.env.REACT_APP_STATUSAPI}`
       );
       setProjects(JSON.parse(response.data.body));
     } catch (error) {

@@ -30,7 +30,7 @@ const EvaluationJobs = () => {
 
   const fetchJobs = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/status`, { withCredentials: false });
+      const response = await axios.get(`${process.env.REACT_APP_STATUSAPI}`, { withCredentials: false });
       setJobs(JSON.parse(response.data.body));
     } catch (error) {
       console.error('Error fetching jobs:', error);

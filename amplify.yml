@@ -1,10 +1,24 @@
-#amplify.yml
 version: 1
+backend:
+  phases:
+    build:
+      commands:
+        - amplifyPush --simple
+        - cd sam-app
+        - sam build
+        - |
+          sam deploy --no-confirm-changeset --no-fail-on-empty-changeset \
+            --stack-name sam-app \
+            --s3-bucket $(node -p "require('../sam-config.json').SAM_DEPLOYMENT_BUCKET") \
+            --capabilities CAPABILITY_IAM \
+            --region $(node -p "require('../sam-config.json').AWS_REGION")
+        - cd ..
+        - node update-env.js
 frontend:
   phases:
     preBuild:
       commands:
-        - npm install
+        - npm ci
     build:
       commands:
         - npm run build
@@ -15,4 +29,3 @@ frontend:
   cache:
     paths:
       - node_modules/**/*
-

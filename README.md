@@ -45,7 +45,7 @@ A tool for evaluating and comparing the performance of multiple large language m
 
 ## Demo
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/9pIXL9Ok22Y?si=SFGjS2Ew0iN39jOl" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+![Alt text](https://img.youtube.com/vi/VID/0.jpg)](https://www.youtube.com/watch?v=VID)
 
 ## Getting Started
 

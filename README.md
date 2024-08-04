@@ -7,6 +7,7 @@ A tool for evaluating and comparing the performance of multiple large language m
 - [Features](#features)
 - [Contributors](#Contributions)
 - [Architecture](#architecture)
+- [Demo](#Demo)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
@@ -17,8 +18,7 @@ A tool for evaluating and comparing the performance of multiple large language m
 ## Contributions
 
  - Ayyanar Jeyakrishnan - Solution Design, Architect, and Code Review
- - Punith P - Front End Development
- - Aadhityaa - Backend Development
+ - Aadhityaa - Full Stack Development - AI Developer
 
 ## Features
 
@@ -43,6 +43,18 @@ A tool for evaluating and comparing the performance of multiple large language m
 
 ![AWS_Bedrock_LLM_Playground](https://github.com/jayyanar/llmeval-bedrock-summarize-scale/assets/12956021/ebc7c30c-dbc4-4be7-b825-f89b9f4e75b9)
 
+## Demo
+
+<center>
+ <iframe width="560" 
+         height="315" 
+         src="https://youtu.be/9pIXL9Ok22Y" 
+         title="YouTube video player" 
+         frameborder="0" 
+         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+         allowfullscreen>
+ </iframe>
+</center>
 
 ## Getting Started
 

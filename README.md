@@ -43,7 +43,7 @@ A tool for evaluating and comparing the performance of multiple large language m
 
 ![AWS_Bedrock_LLM_Playground](https://github.com/jayyanar/llmeval-bedrock-summarize-scale/assets/12956021/ebc7c30c-dbc4-4be7-b825-f89b9f4e75b9)
 
-## Demo
+## Quick 2 Min Demo video
 
 [![image](https://github.com/user-attachments/assets/4c45567b-1077-4255-a0f1-bae385f1165e)](https://youtu.be/9pIXL9Ok22Y?si=Zvh9se_dr8yFwVcM)
 

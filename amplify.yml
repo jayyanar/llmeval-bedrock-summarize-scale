@@ -29,3 +29,20 @@ frontend:
   cache:
     paths:
       - node_modules/**/*
+  customHeaders:
+    - pattern: '**/*'
+      headers:
+        - key: 'Cache-Control'
+          value: 'public, max-age=0, must-revalidate'
+    - pattern: 'static/**/*'
+      headers:
+        - key: 'Cache-Control'
+          value: 'public, max-age=31536000, immutable'
+    - pattern: 'index.html'
+      headers:
+        - key: 'Cache-Control'
+          value: 'public, max-age=0, must-revalidate'
+  redirects:
+    - source: '</^[^.]+$|\\.(?!(css|gif|ico|jpg|js|png|txt|svg|woff|ttf|map|json)$)([^.]+$)/'
+      target: '/index.html'
+      status: '200'

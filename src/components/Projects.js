@@ -1,14 +1,15 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
 import {
   CheckCircleIcon,
   ExclamationCircleIcon,
   XCircleIcon,
-} from "@heroicons/react/24/solid";
+} from '@heroicons/react/24/solid';
 
 const StatusIcon = ({ status }) => {
   switch (status?.toLowerCase()) {
-    case "running":
+    case 'running':
       return (
         <svg
           className="animate-spin h-5 w-5 text-blue-500"
@@ -31,18 +32,33 @@ const StatusIcon = ({ status }) => {
           ></path>
         </svg>
       );
-    case "failed":
+    case 'failed':
       return <ExclamationCircleIcon className="h-5 w-5 text-red-500" />;
-    case "stopped":
+    case 'stopped':
       return <XCircleIcon className="h-5 w-5 text-red-500" />;
-    case "completed":
+    case 'completed':
       return <CheckCircleIcon className="h-5 w-5 text-green-500" />;
     default:
       return null;
   }
 };
 
-const Projects = ({ projects = [] }) => {
+const Projects = () => {
+  const [projects, setProjects] = useState([]);
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  const fetchProjects = async () => {
+    try {
+      const response = await axios.get(`${process.env.REACT_APP_STATUSAPI}`, { withCredentials: false });
+      setProjects(JSON.parse(response.data.body));
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+    }
+  };
+
   return (
     <div>
       <h2 className="text-2xl font-bold mb-6">Projects</h2>
@@ -51,13 +67,10 @@ const Projects = ({ projects = [] }) => {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Job ID
+                Run ID
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Status
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Date
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Action
@@ -66,24 +79,18 @@ const Projects = ({ projects = [] }) => {
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {projects.map((project) => (
-              <tr key={project.RunID || project.id}>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {project.RunID || project.id}
-                </td>
+              <tr key={project.RunID}>
+                <td className="px-6 py-4 whitespace-nowrap">{project.RunID}</td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
-                    <StatusIcon status={project.Status || project.status} />
-                    <span className="ml-2 capitalize">
-                      {project.Status || project.status}
-                    </span>
+                    <StatusIcon status={project.Status} />
+                    <span className="ml-2 capitalize">{project.Status}</span>
                   </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">{project.date}</td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  {project.Status?.toLowerCase() === "completed" ||
-                  project.status?.toLowerCase() === "completed" ? (
+                  {project.Status?.toLowerCase() === 'completed' ? (
                     <Link
-                      to={`/result/${project.RunID || project.id}`}
+                      to={`/result/${project.RunID}`}
                       className="text-blue-600 hover:text-blue-900"
                     >
                       View Results

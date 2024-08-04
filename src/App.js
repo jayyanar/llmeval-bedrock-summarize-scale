@@ -153,7 +153,7 @@ function App() {
             <Route path="/evaluation-jobs" element={<EvaluationJobs />} />
             <Route path="/prompts" element={<Prompts />} />
             <Route path="/results/:runId" element={<ResultView />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </div>
       </div>

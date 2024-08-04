@@ -1,0 +1,342 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: LLM Evaluation SAM Template
+
+Globals:
+  Function:
+    Timeout: 300
+    Runtime: python3.11
+    MemorySize: 256
+    Layers:
+      - arn:aws:lambda:us-east-1:471112802887:layer:boto3latest:1 # Boto3 Layer hardcoded need to be removed use arn:aws:lambda:us-east-1:YOUR_ACCOUNT_ID:layer:boto3latest:1
+
+Resources:
+  SAMDeploymentBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "${AWS::StackName}-deployment-${AWS::AccountId}-${AWS::Region}"
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+
+  Model1Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/model1/
+      Handler: app.lambda_handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ModelResultTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref RunStatusTable
+        - S3CrudPolicy:
+            BucketName: input-datas-directory
+        - S3CrudPolicy:
+            BucketName: outputs-data-directory
+        - Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:*
+              Resource: '*'
+      Environment:
+        Variables:
+          MODEL_RESULT_TABLE: !Ref ModelResultTable
+          RUN_STATUS_TABLE: !Ref RunStatusTable
+          MODEL_KEY: model1
+          ROLE_ARN: !GetAtt BedrockRole.Arn
+
+  Model2Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/model2/
+      Handler: app.lambda_handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ModelResultTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref RunStatusTable
+        - S3CrudPolicy:
+            BucketName: input-datas-directory
+        - S3CrudPolicy:
+            BucketName: outputs-data-directory
+        - Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:*
+              Resource: '*'
+      Environment:
+        Variables:
+          MODEL_RESULT_TABLE: !Ref ModelResultTable
+          RUN_STATUS_TABLE: !Ref RunStatusTable
+          MODEL_KEY: model2
+          ROLE_ARN: !GetAtt BedrockRole.Arn
+
+  Model3Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/model3/
+      Handler: app.lambda_handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ModelResultTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref RunStatusTable
+        - S3CrudPolicy:
+            BucketName: input-datas-directory
+        - S3CrudPolicy:
+            BucketName: outputs-data-directory
+        - Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:*
+              Resource: '*'
+      Environment:
+        Variables:
+          MODEL_RESULT_TABLE: !Ref ModelResultTable
+          RUN_STATUS_TABLE: !Ref RunStatusTable
+          MODEL_KEY: model3
+          ROLE_ARN: !GetAtt BedrockRole.Arn
+
+  CheckStatus1Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/check_status/
+      Handler: app.lambda_handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ModelResultTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref RunStatusTable
+        - S3CrudPolicy:
+            BucketName: outputs-data-directory
+        - Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:*
+              Resource: '*'
+      Environment:
+        Variables:
+          MODEL_RESULT_TABLE: !Ref ModelResultTable
+          RUN_STATUS_TABLE: !Ref RunStatusTable
+
+  CheckStatus2Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/check_status/
+      Handler: app.lambda_handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ModelResultTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref RunStatusTable
+        - S3CrudPolicy:
+            BucketName: outputs-data-directory
+        - Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:*
+              Resource: '*'
+      Environment:
+        Variables:
+          MODEL_RESULT_TABLE: !Ref ModelResultTable
+          RUN_STATUS_TABLE: !Ref RunStatusTable
+
+  CheckStatus3Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/check_status/
+      Handler: app.lambda_handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ModelResultTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref RunStatusTable
+        - S3CrudPolicy:
+            BucketName: outputs-data-directory
+        - Statement:
+            - Effect: Allow
+              Action:
+                - bedrock:*
+              Resource: '*'
+      Environment:
+        Variables:
+          MODEL_RESULT_TABLE: !Ref ModelResultTable
+          RUN_STATUS_TABLE: !Ref RunStatusTable
+
+  PromptApi:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/prompt/
+      Handler: app.lambda_handler
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /prompt
+            Method: get
+            RestApiId: !Ref ApiGatewayApi
+
+  ResultApi:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/result/
+      Handler: app.lambda_handler
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /result
+            Method: post
+            RestApiId: !Ref ApiGatewayApi
+
+  StatusApi:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/status/
+      Handler: app.lambda_handler
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /status
+            Method: get
+            RestApiId: !Ref ApiGatewayApi
+
+  LLMEvaluationStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri: functions/statemachine/definition.asl.json
+      DefinitionSubstitutions:
+        Model1FunctionArn: !GetAtt Model1Function.Arn
+        Model2FunctionArn: !GetAtt Model2Function.Arn
+        Model3FunctionArn: !GetAtt Model3Function.Arn
+        CheckModelStatus-model1Arn: !GetAtt CheckStatus1Function.Arn
+        ModelStatus-model2Arn: !GetAtt CheckStatus2Function.Arn
+        ModelStatus-model3Arn: !GetAtt CheckStatus3Function.Arn
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: !Ref Model1Function
+        - LambdaInvokePolicy:
+            FunctionName: !Ref Model2Function
+        - LambdaInvokePolicy:
+            FunctionName: !Ref Model3Function
+        - LambdaInvokePolicy:
+            FunctionName: !Ref CheckStatus1Function
+        - LambdaInvokePolicy:
+            FunctionName: !Ref CheckStatus2Function
+        - LambdaInvokePolicy:
+            FunctionName: !Ref CheckStatus3Function
+
+  ApiGatewayApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: Prod
+      Cors:
+        AllowMethods: "'GET,POST,OPTIONS'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowOrigin: "'*'"
+      DefinitionBody:
+        swagger: '2.0'
+        info:
+          title: LLM Evaluation API
+        paths:
+          /execute:
+            post:
+              x-amazon-apigateway-integration:
+                uri: 
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:states:action/StartExecution
+                responses: {}
+                httpMethod: POST
+                type: aws
+                credentials: !GetAtt ApiGatewayStepFunctionRole.Arn
+                requestTemplates:
+                  application/json: |
+                    {
+                      "input": "$util.escapeJavaScript($input.json('$'))",
+                      "stateMachineArn": "${LLMEvaluationStateMachine.Arn}"
+                    }
+                passthroughBehavior: WHEN_NO_TEMPLATES
+
+  ApiGatewayStepFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: apigateway.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: StepFunctionExecution
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: states:StartExecution
+                Resource: !Ref LLMEvaluationStateMachine
+
+  ModelResultTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: RunID
+          AttributeType: S
+      KeySchema:
+        - AttributeName: RunID
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+  RunStatusTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: RunID
+          AttributeType: S
+      KeySchema:
+        - AttributeName: RunID
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+  BedrockRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: bedrock.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: BedrockS3Access
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                Resource:
+                  - arn:aws:s3:::input-datas-directory/*
+                  - arn:aws:s3:::outputs-data-directory/*
+
+Outputs:
+  ExecuteApi:
+    Description: "API Gateway endpoint URL for Execute Step Function"
+    Value: !Sub "https://${ApiGatewayApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/execute/"
+  PromptApi:
+    Description: "API Gateway endpoint URL for Prompt function"
+    Value: !Sub "https://${ApiGatewayApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/prompt/"
+  ResultApi:
+    Description: "API Gateway endpoint URL for Result function"
+    Value: !Sub "https://${ApiGatewayApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/result/"
+  StatusApi:
+    Description: "API Gateway endpoint URL for Status function"
+    Value: !Sub "https://${ApiGatewayApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/status/"
+  SAMDeploymentBucketName:
+    Description: "Name of the S3 bucket used for SAM deployments"
+    Value: !Ref SAMDeploymentBucket

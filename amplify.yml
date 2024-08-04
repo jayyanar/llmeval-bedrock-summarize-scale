@@ -1,0 +1,48 @@
+version: 1
+backend:
+  phases:
+    build:
+      commands:
+        - amplifyPush --simple
+        - cd sam-app
+        - sam build
+        - |
+          sam deploy --no-confirm-changeset --no-fail-on-empty-changeset \
+            --stack-name sam-app \
+            --s3-bucket $(node -p "require('../sam-config.json').SAM_DEPLOYMENT_BUCKET") \
+            --capabilities CAPABILITY_IAM \
+            --region $(node -p "require('../sam-config.json').AWS_REGION")
+        - cd ..
+        - node update-env.js
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - npm ci
+    build:
+      commands:
+        - npm run build
+  artifacts:
+    baseDirectory: build
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*
+  customHeaders:
+    - pattern: '**/*'
+      headers:
+        - key: 'Cache-Control'
+          value: 'public, max-age=0, must-revalidate'
+    - pattern: 'static/**/*'
+      headers:
+        - key: 'Cache-Control'
+          value: 'public, max-age=31536000, immutable'
+    - pattern: 'index.html'
+      headers:
+        - key: 'Cache-Control'
+          value: 'public, max-age=0, must-revalidate'
+  redirects:
+    - source: '</^[^.]+$|\\.(?!(css|gif|ico|jpg|js|png|txt|svg|woff|ttf|map|json)$)([^.]+$)/'
+      target: '/index.html'
+      status: '200'

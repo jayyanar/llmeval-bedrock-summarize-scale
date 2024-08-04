@@ -1,0 +1,229 @@
+{
+    "Comment": "Parallel LLM Evaluation using AWS Step Functions with User-Provided RunID",
+    "StartAt": "ParallelModelEvaluation",
+    "States": {
+      "ParallelModelEvaluation": {
+        "Type": "Parallel",
+        "Branches": [
+          {
+            "StartAt": "EvaluateModel1",
+            "States": {
+              "EvaluateModel1": {
+                "Type": "Task",
+                "Resource": "${Model1FunctionArn}",
+                "Parameters": {
+                  "RunID.$": "$.RunID",
+                  "Context.$": "$.Context",
+                  "model1.$": "$.Model1"
+                },
+                "ResultPath": "$.Model1Result",
+                "Next": "WaitBeforeFirstCheck1",
+                "TimeoutSeconds": 300
+              },
+              "WaitBeforeFirstCheck1": {
+                "Type": "Wait",
+                "Seconds": 60,
+                "Next": "CheckModel1Status"
+              },
+              "CheckModel1Status": {
+                "Type": "Task",
+                "Resource": "${CheckModelStatus-model1Arn}",
+                "Parameters": {
+                  "RunID.$": "$.RunID",
+                  "Model": "model1"
+                },
+                "ResultPath": "$.Model1StatusCheck",
+                "Next": "IsModel1Complete",
+                "TimeoutSeconds": 300
+              },
+              "IsModel1Complete": {
+                "Type": "Choice",
+                "Choices": [
+                  {
+                    "Variable": "$.Model1StatusCheck.body",
+                    "StringMatches": "*\"status\": \"Completed\"*",
+                    "Next": "Model1Completed"
+                  },
+                  {
+                    "Or": [
+                      {
+                        "Variable": "$.Model1StatusCheck.body",
+                        "StringMatches": "*\"status\": \"Failed\"*"
+                      },
+                      {
+                        "Variable": "$.Model1StatusCheck.body",
+                        "StringMatches": "*\"status\": \"Stopped\"*"
+                      }
+                    ],
+                    "Next": "Model1Failed"
+                  }
+                ],
+                "Default": "WaitForModel1"
+              },
+              "WaitForModel1": {
+                "Type": "Wait",
+                "Seconds": 60,
+                "Next": "CheckModel1Status"
+              },
+              "Model1Completed": {
+                "Type": "Pass",
+                "End": true
+              },
+              "Model1Failed": {
+                "Type": "Fail",
+                "Cause": "Model 1 evaluation failed or was stopped",
+                "Error": "Model1FailedError"
+              }
+            }
+          },
+          {
+            "StartAt": "EvaluateModel2",
+            "States": {
+              "EvaluateModel2": {
+                "Type": "Task",
+                "Resource": "${Model2FunctionArn}",
+                "Parameters": {
+                  "RunID.$": "$.RunID",
+                  "Context.$": "$.Context",
+                  "model2.$": "$.Model2"
+                },
+                "ResultPath": "$.Model2Result",
+                "Next": "WaitBeforeFirstCheck2",
+                "TimeoutSeconds": 300
+              },
+              "WaitBeforeFirstCheck2": {
+                "Type": "Wait",
+                "Seconds": 60,
+                "Next": "CheckModel2Status"
+              },
+              "CheckModel2Status": {
+                "Type": "Task",
+                "Resource": "${ModelStatus-model2Arn}",
+                "Parameters": {
+                  "RunID.$": "$.RunID",
+                  "Model": "model2"
+                },
+                "ResultPath": "$.Model2StatusCheck",
+                "Next": "IsModel2Complete",
+                "TimeoutSeconds": 300
+              },
+              "IsModel2Complete": {
+                "Type": "Choice",
+                "Choices": [
+                  {
+                    "Variable": "$.Model2StatusCheck.body",
+                    "StringMatches": "*\"status\": \"Completed\"*",
+                    "Next": "Model2Completed"
+                  },
+                  {
+                    "Or": [
+                      {
+                        "Variable": "$.Model2StatusCheck.body",
+                        "StringMatches": "*\"status\": \"Failed\"*"
+                      },
+                      {
+                        "Variable": "$.Model2StatusCheck.body",
+                        "StringMatches": "*\"status\": \"Stopped\"*"
+                      }
+                    ],
+                    "Next": "Model2Failed"
+                  }
+                ],
+                "Default": "WaitForModel2"
+              },
+              "WaitForModel2": {
+                "Type": "Wait",
+                "Seconds": 60,
+                "Next": "CheckModel2Status"
+              },
+              "Model2Completed": {
+                "Type": "Pass",
+                "End": true
+              },
+              "Model2Failed": {
+                "Type": "Fail",
+                "Cause": "Model 2 evaluation failed or was stopped",
+                "Error": "Model2FailedError"
+              }
+            }
+          },
+          {
+            "StartAt": "EvaluateModel3",
+            "States": {
+              "EvaluateModel3": {
+                "Type": "Task",
+                "Resource": "${Model3FunctionArn}",
+                "Parameters": {
+                  "RunID.$": "$.RunID",
+                  "Context.$": "$.Context",
+                  "model3.$": "$.Model3"
+                },
+                "ResultPath": "$.Model3Result",
+                "Next": "WaitBeforeFirstCheck3",
+                "TimeoutSeconds": 300
+              },
+              "WaitBeforeFirstCheck3": {
+                "Type": "Wait",
+                "Seconds": 60,
+                "Next": "CheckModel3Status"
+              },
+              "CheckModel3Status": {
+                "Type": "Task",
+                "Resource": "${ModelStatus-model3Arn}",
+                "Parameters": {
+                  "RunID.$": "$.RunID",
+                  "Model": "model3"
+                },
+                "ResultPath": "$.Model3StatusCheck",
+                "Next": "IsModel3Complete",
+                "TimeoutSeconds": 300
+              },
+              "IsModel3Complete": {
+                "Type": "Choice",
+                "Choices": [
+                  {
+                    "Variable": "$.Model3StatusCheck.body",
+                    "StringMatches": "*\"status\": \"Completed\"*",
+                    "Next": "Model3Completed"
+                  },
+                  {
+                    "Or": [
+                      {
+                        "Variable": "$.Model3StatusCheck.body",
+                        "StringMatches": "*\"status\": \"Failed\"*"
+                      },
+                      {
+                        "Variable": "$.Model3StatusCheck.body",
+                        "StringMatches": "*\"status\": \"Stopped\"*"
+                      }
+                    ],
+                    "Next": "Model3Failed"
+                  }
+                ],
+                "Default": "WaitForModel3"
+              },
+              "WaitForModel3": {
+                "Type": "Wait",
+                "Seconds": 60,
+                "Next": "CheckModel3Status"
+              },
+              "Model3Completed": {
+                "Type": "Pass",
+                "End": true
+              },
+              "Model3Failed": {
+                "Type": "Fail",
+                "Cause": "Model 3 evaluation failed or was stopped",
+                "Error": "Model3FailedError"
+              }
+            }
+          }
+        ],
+        "Next": "SuccessState"
+      },
+      "SuccessState": {
+        "Type": "Succeed",
+        "Comment": "LLM Evaluation Completed Successfully"
+      }
+    }
+  }

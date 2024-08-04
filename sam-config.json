@@ -1,0 +1,4 @@
+{
+    "SAM_DEPLOYMENT_BUCKET": "aws-sam-cli-managed-default-samclisourcebucket-ji3ykywqmcqk",
+    "AWS_REGION": "us-east-1"
+  }

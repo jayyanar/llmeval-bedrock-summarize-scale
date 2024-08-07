@@ -7,6 +7,12 @@ dynamodb = boto3.client('dynamodb')
 RUN_STATUS_TABLE = os.environ['RUN_STATUS_TABLE']
 
 def lambda_handler(event, context):
+    headers = {
+    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'OPTIONS,GET',
+    'Content-Type': 'application/json'
+    }
     table_name = RUN_STATUS_TABLE
     
     run_id = event.get('pathParameters', {}).get('runid', None)
@@ -39,9 +45,7 @@ def lambda_handler(event, context):
     return {
         'statusCode': 200,
         'body': json.dumps(result),
-        'headers': {
-            'Content-Type': 'application/json'
-        }
+        'headers': headers
     }
 
 def query_run_status(run_id):

@@ -165,6 +165,11 @@ def get_supported_metrics(model_id):
     return ["Builtin.Accuracy", "Builtin.Robustness"]
 
 def lambda_handler(event, context):
+    headers = {
+    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET'
+    }
     user_context = event.get("Context", "Default context")
     run_id = event.get("RunID", str(uuid.uuid4()))
     eval_model = event.get("eval_model", "anthropic.claude-3-sonnet-20240229-v1:0")
@@ -278,6 +283,7 @@ def lambda_handler(event, context):
 
         return {
             'statusCode': 200,
+            'headers': headers,
             'body': json.dumps({ 'RunID': run_id, 'Model': model_key, 'jobArn': job_arn, 's3Uri': s3_uri})
         }
 
@@ -286,5 +292,6 @@ def lambda_handler(event, context):
         update_run_status(run_id, "Failed")
         return {
             'statusCode': 500,
+            'headers': headers,
             'body': json.dumps({'error': str(e)})
         }

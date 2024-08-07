@@ -136,3 +136,8 @@ rm temp_deploy.js
 npm run build
 
 echo "Deployment process completed."
+
+# deploy amplify 
+amplify publish -y
+
+echo "Amplify deployment completed."

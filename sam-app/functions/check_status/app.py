@@ -11,6 +11,12 @@ MODEL_RESULT_TABLE = os.environ['MODEL_RESULT_TABLE']
 RUN_STATUS_TABLE = os.environ['RUN_STATUS_TABLE']
 
 def lambda_handler(event, context):
+    headers = {
+    'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
+    'Content-Type': 'application/json'
+}
     run_id = event['RunID']
     model_key = event['Model']  
     
@@ -20,7 +26,8 @@ def lambda_handler(event, context):
         if not job_arn:
             return {
                 'statusCode': 400,
-                'body': json.dumps({'error': 'Job ARN not found in DynamoDB'})
+                'body': json.dumps({'error': 'Job ARN not found in DynamoDB'}),
+                'headers': headers
             }
         
         job_status, s3_uri = get_evaluation_job_status(job_arn)
@@ -37,7 +44,8 @@ def lambda_handler(event, context):
                 'body': json.dumps({
                     'status': 'Completed',
                     'results': results
-                })
+                }),
+                'headers': headers
             }
         elif job_status in ['Failed', 'Stopped']:
             update_run_status(run_id, job_status)
@@ -47,7 +55,8 @@ def lambda_handler(event, context):
                 'body': json.dumps({
                     'status': job_status,
                     'error': 'Evaluation job failed or was stopped'
-                })
+                }),
+                'headers': headers
             }
         else:
             return {
@@ -55,14 +64,16 @@ def lambda_handler(event, context):
                 'body': json.dumps({
                     'status': 'In Progress',
                     'message': f'Evaluation job is still {job_status}'
-                })
+                }),
+                'headers': headers
             }
     
     except Exception as e:
         print(f"ERROR: {str(e)}")
         return {
             'statusCode': 500,
-            'body': json.dumps({'error': str(e)})
+            'body': json.dumps({'error': str(e)}),
+            'headers': headers
         }
 
 

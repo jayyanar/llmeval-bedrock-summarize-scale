@@ -3,6 +3,13 @@ import boto3
 import os
 
 def lambda_handler(event, context):
+    headers = {
+        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
+        'Content-Type': 'application/json'
+    }
+
     dynamodb = boto3.client('dynamodb')
     table_name = os.environ['MODEL_RESULT_TABLE']
     
@@ -34,9 +41,7 @@ def lambda_handler(event, context):
         result = [{'RunID': item['RunID']['S'], 'Context': item['Context']['S']} for item in items]
     
     return {
-        'statusCode': 200,
-        'body': json.dumps(result),
-        'headers': {
-            'Content-Type': 'application/json'
-        }
-    }
+            'statusCode': 200,
+            'body': json.dumps(result),
+            'headers': headers
+            }

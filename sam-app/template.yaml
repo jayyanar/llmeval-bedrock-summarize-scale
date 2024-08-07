@@ -8,7 +8,7 @@ Globals:
     Runtime: python3.11
     MemorySize: 256
     Layers:
-      - arn:aws:lambda:us-east-1:471112802887:layer:boto3latest:1 # Boto3 Layer hardcoded need to be removed use arn:aws:lambda:us-east-1:YOUR_ACCOUNT_ID:layer:boto3latest:1
+      - arn_of_boto3_layer_latest # Boto3 Layer hardcoded need to be removed use arn:aws:lambda:us-east-1:YOUR_ACCOUNT_ID:layer:boto3latest:1
 
 Resources:
   SAMDeploymentBucket:
@@ -230,6 +230,7 @@ Resources:
         - LambdaInvokePolicy:
             FunctionName: !Ref CheckStatus3Function
 
+  
   ApiGatewayApi:
     Type: AWS::Serverless::Api
     Properties:
@@ -242,8 +243,42 @@ Resources:
         swagger: '2.0'
         info:
           title: LLM Evaluation API
+        x-amazon-apigateway-binary-media-types:
+          - '*/*'
         paths:
           /execute:
+            options:
+              summary: CORS support
+              description: Enable CORS by returning correct headers
+              consumes:
+                - application/json
+              produces:
+                - application/json
+              tags:
+                - CORS
+              x-amazon-apigateway-integration:
+                type: mock
+                requestTemplates:
+                  application/json: "{\n  \"statusCode\" : 200\n}\n"
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                      method.response.header.Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                    responseTemplates:
+                      application/json: "{}\n"
+              responses:
+                '200':
+                  description: Default response for CORS method
+                  headers:
+                    Access-Control-Allow-Headers:
+                      type: "string"
+                    Access-Control-Allow-Methods:
+                      type: "string"
+                    Access-Control-Allow-Origin:
+                      type: "string"
             post:
               x-amazon-apigateway-integration:
                 uri: 
@@ -259,7 +294,124 @@ Resources:
                       "stateMachineArn": "${LLMEvaluationStateMachine.Arn}"
                     }
                 passthroughBehavior: WHEN_NO_TEMPLATES
-
+          /prompt:
+            options:
+              summary: CORS support
+              description: Enable CORS by returning correct headers
+              consumes:
+                - application/json
+              produces:
+                - application/json
+              tags:
+                - CORS
+              x-amazon-apigateway-integration:
+                type: mock
+                requestTemplates:
+                  application/json: "{\n  \"statusCode\" : 200\n}\n"
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                      method.response.header.Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                    responseTemplates:
+                      application/json: "{}\n"
+              responses:
+                '200':
+                  description: Default response for CORS method
+                  headers:
+                    Access-Control-Allow-Headers:
+                      type: "string"
+                    Access-Control-Allow-Methods:
+                      type: "string"
+                    Access-Control-Allow-Origin:
+                      type: "string"
+            get:
+              x-amazon-apigateway-integration:
+                uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PromptApi.Arn}/invocations"
+                responses: {}
+                httpMethod: POST
+                type: aws_proxy
+          /result:
+            options:
+              summary: CORS support
+              description: Enable CORS by returning correct headers
+              consumes:
+                - application/json
+              produces:
+                - application/json
+              tags:
+                - CORS
+              x-amazon-apigateway-integration:
+                type: mock
+                requestTemplates:
+                  application/json: "{\n  \"statusCode\" : 200\n}\n"
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                      method.response.header.Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                    responseTemplates:
+                      application/json: "{}\n"
+              responses:
+                '200':
+                  description: Default response for CORS method
+                  headers:
+                    Access-Control-Allow-Headers:
+                      type: "string"
+                    Access-Control-Allow-Methods:
+                      type: "string"
+                    Access-Control-Allow-Origin:
+                      type: "string"
+            post:
+              x-amazon-apigateway-integration:
+                uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ResultApi.Arn}/invocations"
+                responses: {}
+                httpMethod: POST
+                type: aws_proxy
+          /status:
+            options:
+              summary: CORS support
+              description: Enable CORS by returning correct headers
+              consumes:
+                - application/json
+              produces:
+                - application/json
+              tags:
+                - CORS
+              x-amazon-apigateway-integration:
+                type: mock
+                requestTemplates:
+                  application/json: "{\n  \"statusCode\" : 200\n}\n"
+                responses:
+                  default:
+                    statusCode: "200"
+                    responseParameters:
+                      method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+                      method.response.header.Access-Control-Allow-Methods: "'GET,POST,OPTIONS'"
+                      method.response.header.Access-Control-Allow-Origin: "'*'"
+                    responseTemplates:
+                      application/json: "{}\n"
+              responses:
+                '200':
+                  description: Default response for CORS method
+                  headers:
+                    Access-Control-Allow-Headers:
+                      type: "string"
+                    Access-Control-Allow-Methods:
+                      type: "string"
+                    Access-Control-Allow-Origin:
+                      type: "string"
+            get:
+              x-amazon-apigateway-integration:
+                uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${StatusApi.Arn}/invocations"
+                responses: {}
+                httpMethod: POST
+                type: aws_proxy
+                          
   ApiGatewayStepFunctionRole:
     Type: AWS::IAM::Role
     Properties:

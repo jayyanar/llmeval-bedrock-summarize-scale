@@ -79,61 +79,32 @@ This project sets up an AWS infrastructure for evaluating Language Learning Mode
 
 ## Setup Instructions
 
-### 1. Backend Setup
 
-1. Navigate to the `backend` directory:
+1. Update the `sam-config.json` file with your specific ARNs and configuration details.
+
+2. Do the configurations.
    ```
-   cd backend
+   - Do all the configurations in the sam-config.json file
+   - Also setup amplify, sam and aws cli in your local 
+   - Complete the configuration in local system by doing below commands
+      aws configure
+      amplify configure
+      sam configure
+   - You need to configure with your aws account details and credentials.
    ```
-
-2. Update the `config.json` file with your specific ARNs and configuration details.
-
-3. Deploy the SAM application:
+3. After configuration for deploying complete application including backend and frontend, run the below commands.
    ```
-   sam build
-   sam deploy --guided
+   npm install
+   chmod +x deploy.sh
+   ./deploy.sh
    ```
-   Follow the prompts and provide necessary information.
-
-4. After deployment, note down the API endpoints provided in the outputs.
-
-### 2. Frontend Setup
-
-1. Navigate back to the root directory and update the `.env` file with the API endpoints:
+   This will deploy the complete application including backend and frontend.
+4. After deployment, the APIs will be updated in the .env file in the root directory.
    ```
    REACT_APP_PROMPT_API=<PromptApi from SAM outputs>
    REACT_APP_RESULT_API=<ResultApi from SAM outputs>
    REACT_APP_STATUS_API=<StatusApi from SAM outputs>
    REACT_APP_EXECUTE_API=<ExecuteApi from SAM outputs>
-   ```
-
-2. Install dependencies:
-   ```
-   npm install
-   ```
-
-3. Start the development server:
-   ```
-   npm start
-   ```
-
-### 3. Amplify Setup (Optional)
-
-If you want to deploy your React application using AWS Amplify:
-
-1. Initialize Amplify in your project:
-   ```
-   amplify init
-   ```
-
-2. Add hosting:
-   ```
-   amplify add hosting
-   ```
-
-3. Publish your app:
-   ```
-   amplify publish
    ```
 
 ## Required IAM Permissions
@@ -173,4 +144,9 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 This project is licensed under the MIT License - see the LICENSE file for details.
 
 
- aws cloudformation delete-stack --stack-name sam-test --region us-east-1
+## Cleanup
+ To clean up the entire stack, run the below command.
+   ```
+   aws cloudformation delete-stack --stack-name sam-deploy --region us-east-1
+   ```
+

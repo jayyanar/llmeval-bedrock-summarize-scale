@@ -1,8 +1,14 @@
 import boto3
 import os
 from boto3.dynamodb.conditions import Key
-
+import json
 def lambda_handler(event, context):
+    headers = {
+        'Access-Control-Allow-Headers': 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
+        'Content-Type': 'application/json'
+    }
     dynamodb = boto3.resource('dynamodb')
     table = dynamodb.Table(os.environ['MODEL_RESULT_TABLE'])
     run_id = event['RunID']
@@ -29,4 +35,8 @@ def lambda_handler(event, context):
                 'toxicity': model_data.get('Toxicity', '')
             }
     
-    return result
+    return {
+            'statusCode': 200,
+            'body': json.dumps(result),
+            'headers': headers
+        }
